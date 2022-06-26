@@ -30,7 +30,7 @@ public class ReviewService {
 		User user = authService.authenticated();
 		Movie movie = movieRepository.getOne(dto.getMovieId());
 
-		Review entity = new Review(dto.getText(), user, movie);
+		Review entity = new Review(dto.getText().strip(), user, movie);
 
 		entity = repository.save(entity);
 
@@ -44,4 +44,3 @@ public class ReviewService {
 		return list.stream().map(x -> new ReviewDTO(x)).collect(Collectors.toList());
 	}
 }
-
