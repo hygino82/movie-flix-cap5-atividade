@@ -18,6 +18,7 @@ public class Review implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+	
 	private String text;
 
 	@ManyToOne
@@ -33,6 +34,12 @@ public class Review implements Serializable {
 
 	public Review(Long id, String text, User user, Movie movie) {
 		this.id = id;
+		this.text = text;
+		this.user = user;
+		this.movie = movie;
+	}
+	
+	public Review(String text, User user, Movie movie) {
 		this.text = text;
 		this.user = user;
 		this.movie = movie;

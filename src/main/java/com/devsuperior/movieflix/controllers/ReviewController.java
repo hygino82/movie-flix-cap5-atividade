@@ -1,15 +1,19 @@
 package com.devsuperior.movieflix.controllers;
 
+import java.net.URI;
+
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.devsuperior.movieflix.dto.ReviewDTO;
-import com.devsuperior.movieflix.entities.Review;
 import com.devsuperior.movieflix.services.ReviewService;
 
 @RestController
@@ -17,12 +21,14 @@ import com.devsuperior.movieflix.services.ReviewService;
 public class ReviewController {
 
 	@Autowired
-	private ReviewService service;
+	private ReviewService reviewService;
 
+	@PreAuthorize("hasanyRole('MEMBER')")
 	@PostMapping
-	public ResponseEntity<ReviewDTO> save(@RequestBody Review review) {
-		ReviewDTO obj = service.save(review);
+	public ResponseEntity<ReviewDTO> insert(@Valid @RequestBody ReviewDTO dto) {
+		dto = reviewService.insert(dto);
+		URI uri = ServletUriComponentsBuilder.fromCurrentRequestUri().path("/{id}").buildAndExpand(dto.getId()).toUri();
 
-		return ResponseEntity.status(HttpStatus.CREATED).body(obj);
+		return ResponseEntity.created(uri).body(dto);
 	}
 }
