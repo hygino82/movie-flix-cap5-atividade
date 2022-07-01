@@ -1,5 +1,8 @@
 package com.devsuperior.movieflix.services;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,35 +16,39 @@ import com.devsuperior.movieflix.dto.UserDTO;
 import com.devsuperior.movieflix.entities.User;
 import com.devsuperior.movieflix.repositories.UserRepository;
 
-
-
 @Service
 public class UserService implements UserDetailsService {
-	
-	 private static Logger logger = LoggerFactory.getLogger(UserService.class);
 
-	    @Autowired
-	    private UserRepository repository;
+	private static Logger logger = LoggerFactory.getLogger(UserService.class);
 
-	    @Autowired
-	    private AuthService service;
+	@Autowired
+	private UserRepository repository;
 
-	    @Transactional(readOnly = true)
-	    public UserDTO findProfileSelf() {
-	        User user = service.authenticated();
-	        return new UserDTO(user);
-	    }
+	@Autowired
+	private AuthService service;
 
-	    @Override
-	    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+	@Transactional(readOnly = true)
+	public UserDTO findProfileSelf() {
+		User user = service.authenticated();
+		return new UserDTO(user);
+	}
 
-	        User user = repository.findByEmail(username);
+	@Override
+	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-	        if (user == null) {
-	            logger.error("User not found: " + username);
-	            throw new UsernameNotFoundException("Email not found");
-	        }
-	        logger.info("User found: " + username);
-	        return user;
-	    }
+		User user = repository.findByEmail(username);
+
+		if (user == null) {
+			logger.error("User not found: " + username);
+			throw new UsernameNotFoundException("Email not found");
+		}
+		logger.info("User found: " + username);
+		return user;
+	}
+
+	public List<UserDTO> findAllUsers() {
+		var list = repository.findAll();
+		List<UserDTO> res = list.stream().map(x -> new UserDTO(x)).collect(Collectors.toList());
+		return res;
+	}
 }
